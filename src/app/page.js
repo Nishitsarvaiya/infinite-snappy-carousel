@@ -7,6 +7,8 @@ import CustomEase from 'gsap/CustomEase';
 gsap.registerPlugin(CustomEase);
 CustomEase.create('snappy', '0.19,1,0.22,1');
 
+const GAP = 32;
+
 const slides = [
 	{ id: 1, image: '/image-1.jpg', title: 'Aurora' },
 	{ id: 2, image: '/image-2.jpg', title: 'Obsidian' },
@@ -18,6 +20,7 @@ const slides = [
 	{ id: 8, image: '/image-2.jpg', title: 'Solace' },
 	{ id: 9, image: '/image-3.jpg', title: 'Vortex' },
 	{ id: 10, image: '/image-4.jpg', title: 'Horizon' },
+	{ id: 11, image: '/image-5.jpg', title: 'Elyfto' },
 ];
 
 const lerp = (a, b, n) => (1 - n) * a + n * b;
@@ -33,12 +36,12 @@ export default function Home() {
 	const translate = useRef(0);
 	const raf = useRef(null);
 	const touchStart = useRef(0);
-	const touchY = useRef(0);
+	const touchX = useRef(0);
 	const isDragging = useRef(false);
 
 	const dispose = (scroll) => {
 		gsap.set(items.current, {
-			width: itemWidth.current,
+			width: itemWidth.current - GAP,
 			x: (i) => i * itemWidth.current + scroll,
 			modifiers: {
 				x: (x) => {
@@ -71,11 +74,11 @@ export default function Home() {
 
 			if (Math.abs(dist) < itemWidth.current / 2) {
 				scale = 2;
-				offsetX = -itemWidth.current * 0.5;
+				offsetX = -(itemWidth.current - GAP) * 0.5;
 			} else if (dist < 0) {
-				offsetX = -itemWidth.current * 0.5;
+				offsetX = -(itemWidth.current - GAP) * 0.5;
 			} else {
-				offsetX = itemWidth.current * 0.5;
+				offsetX = (itemWidth.current - GAP) * 0.5;
 			}
 
 			gsap.to(image, {
@@ -102,14 +105,14 @@ export default function Home() {
 
 	const onResize = () => {
 		listWidth.current = list.current.clientWidth;
-		itemWidth.current = window.innerWidth / (slides.length - 1); // each item covers ~70% of viewport
+		itemWidth.current = window.innerWidth / (slides.length - 4);
 		scrollerWidth.current = items.current.length * itemWidth.current;
 	};
 
 	const update = () => {
 		raf.current = requestAnimationFrame(update);
 
-		translate.current = lerp(translate.current, scrollObj.current.target, 0.08);
+		translate.current = lerp(translate.current, scrollObj.current.target, 0.06);
 
 		const snapPointRatio = 0.5;
 
@@ -117,14 +120,18 @@ export default function Home() {
 			const snapPointX = window.innerWidth * snapPointRatio;
 			const center = translate.current + snapPointX;
 			const index = Math.round((center - itemWidth.current / 2) / itemWidth.current);
-			const snapTarget = index * itemWidth.current + itemWidth.current / 2 - snapPointX;
-			scrollObj.current.target = lerp(scrollObj.current.target, snapTarget, 0.08);
+			const snapTarget = index * itemWidth.current - snapPointX + itemWidth.current / 2 + GAP / 2;
+			scrollObj.current.target = lerp(scrollObj.current.target, snapTarget, 0.06);
 		}
 
 		dispose(translate.current);
 
 		scrollObj.current.speed = translate.current - scrollObj.current.current;
 		scrollObj.current.current = translate.current;
+
+		gsap.to(items.current, {
+			scale: 1 - Math.min(100, Math.abs(scrollObj.current.speed)) * 0.005,
+		});
 	};
 
 	const onTouchStart = (e) => {
@@ -134,9 +141,9 @@ export default function Home() {
 
 	const onTouchMove = (e) => {
 		if (!isDragging.current) return;
-		touchY.current = e.clientX || e.touches[0].clientX;
-		scrollObj.current.target += (touchY.current - touchStart.current) * 1.5;
-		touchStart.current = touchY.current;
+		touchX.current = e.clientX || e.touches[0].clientX;
+		scrollObj.current.target += (touchX.current - touchStart.current) * 1.5;
+		touchStart.current = touchX.current;
 	};
 
 	const onTouchEnd = () => {
@@ -183,6 +190,7 @@ export default function Home() {
 
 	return (
 		<main className='h-screen w-full overflow-clip fixed bg-zinc-950' ref={wrapper}>
+			{/* <div className='fixed top-0 left-1/2 w-px h-full bg-red-500 z-50 pointer-events-none' /> */}
 			<div className='flex items-start select-none pointer-events-none absolute inset-0 pt-[20vh]'>
 				<div className='relative slides flex items-start w-full pointer-events-auto' ref={list}>
 					{slides.map((slide, idx) => (
