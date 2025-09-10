@@ -7,7 +7,7 @@ import CustomEase from 'gsap/CustomEase';
 gsap.registerPlugin(CustomEase);
 CustomEase.create('snappy', '0.19,1,0.22,1');
 
-const GAP = 32;
+const GAP = 64;
 
 const slides = [
 	{ id: 1, image: '/image-1.jpg', title: 'Aurora' },
@@ -55,7 +55,7 @@ export default function Home() {
 			},
 		});
 
-		const center = window.innerWidth / 2;
+		const center = window.innerWidth * 0.635;
 
 		items.current.forEach((el) => {
 			if (!el) return;
@@ -64,7 +64,7 @@ export default function Home() {
 			const elCenter = rect.left + rect.width / 2;
 			const dist = elCenter - center;
 
-			const content = el.querySelector('.item-content');
+			const content = el.querySelectorAll('.item-content');
 			const image = el.querySelector('.item-image');
 
 			if (!content || !image) return;
@@ -105,7 +105,7 @@ export default function Home() {
 
 	const onResize = () => {
 		listWidth.current = list.current.clientWidth;
-		itemWidth.current = window.innerWidth / (slides.length - 4);
+		itemWidth.current = ((240 + GAP) / 1920) * window.innerWidth;
 		scrollerWidth.current = items.current.length * itemWidth.current;
 	};
 
@@ -114,7 +114,7 @@ export default function Home() {
 
 		translate.current = lerp(translate.current, scrollObj.current.target, 0.06);
 
-		const snapPointRatio = 0.5;
+		const snapPointRatio = 0.635;
 
 		if (!isDragging.current) {
 			const snapPointX = window.innerWidth * snapPointRatio;
@@ -190,19 +190,18 @@ export default function Home() {
 
 	return (
 		<main className='h-screen w-full overflow-clip fixed bg-zinc-950' ref={wrapper}>
-			{/* <div className='fixed top-0 left-1/2 w-px h-full bg-red-500 z-50 pointer-events-none' /> */}
+			{/* <div className='fixed top-0 left-[calc((1219/1920)*100vw)] w-px h-full bg-red-500 z-50 pointer-events-none' /> */}
 			<div className='flex items-start select-none pointer-events-none absolute inset-0 pt-[20vh]'>
 				<div className='relative slides flex items-start w-full pointer-events-auto' ref={list}>
 					{slides.map((slide, idx) => (
 						<div className='group absolute' key={slide.id} ref={(ref) => (items.current[idx] = ref)}>
-							<div className='pt-[125%] relative origin-top cursor-pointer'>
+							<div className='pt-[135%] relative origin-top cursor-pointer'>
 								<div className='item-content absolute left-0 bottom-full w-full pb-0.5'>
 									<div className='text-zinc-100 text-sm'>
 										{slide.id < 10 ? '0' + slide.id : slide.id}.
 									</div>
-									<div className='text-zinc-100 my-2'>{slide.title}</div>
 								</div>
-								<div className='item-image absolute inset-0 origin-top overflow-hidden'>
+								<div className='item-image absolute inset-0 origin-top-left'>
 									<div className='absolute inset-0 origin-top overflow-hidden'>
 										<div className='absolute inset-0 overflow-hidden'>
 											<div className='absolute inset-0'>
@@ -216,6 +215,11 @@ export default function Home() {
 													}}
 												/>
 											</div>
+										</div>
+									</div>
+									<div className='absolute left-0 top-full w-full pt-0.5'>
+										<div className='text-zinc-100 scale-50 text-lg origin-top-left'>
+											{slide.title}
 										</div>
 									</div>
 								</div>
