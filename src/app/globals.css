@@ -1,26 +1,97 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #ffffff;
+	--foreground: #171717;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+	}
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.slides-wrap {
+	padding-top: 12.5rem;
+}
+@media (max-aspect-ratio: 9007199254740992/5404319552844595) {
+	.slides-wrap {
+		padding-top: 15rem;
+	}
+}
+.slide {
+	--width: 100%;
+	min-width: var(--width);
+	max-width: var(--width);
+}
+@media (min-width: 650px) {
+	.slide {
+		--width: 14.28571%;
+		--x: 0%;
+		--scale: 0;
+		--x-output: calc(var(--x) * var(--diff));
+		--x-text-output: calc(var(--x-text) * var(--diff));
+		--scale-output: calc(1 + var(--scale) * var(--diff));
+	}
+	.slide.is-left {
+		--x: -50%;
+		--x-text: -50%;
+		--scale: 0;
+	}
+	.slide.is-right {
+		--x: 50%;
+		--x-text: 50%;
+		--scale: 0;
+	}
+	.slide.is-big {
+		--x: 0% !important;
+		--x-text: -50%;
+		--scale: 1 !important;
+	}
+	.slide.is-not-visible {
+		--x: 0%;
+		--x-text: 0%;
+		--scale: 0;
+	}
+	.slide__index {
+		display: none;
+	}
+	@media (max-aspect-ratio: 9007199254740992/5404319552844595) {
+		.slide__index {
+			display: block;
+		}
+	}
+	.slide__text {
+		transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+		transform: translate3d(var(--x-text-output), 0, 0);
+	}
+	@media (hover: hover) and (pointer: fine) {
+		.slide:hover .slide__text {
+			transform: translate3d(var(--x-text-output), -0.75rem, 0);
+		}
+	}
+	.is-not-visible .slide__text {
+		transition: none;
+	}
+	.slide__scale {
+		transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+		transform: translate3d(var(--x-output), 0, 0) scale(var(--scale-output));
+	}
+	.is-not-visible .slide__scale {
+		transition: none;
+	}
 }

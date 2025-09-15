@@ -4,7 +4,8 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import Image from 'next/image';
 
-const GAP = 64;
+const GAP = 0;
+const SNAP_POINT_RATIO = 0.5;
 
 const slides = [
 	{ id: 1, image: '/image-1.jpg', title: 'Aurora' },
@@ -50,9 +51,10 @@ export default function Carousel() {
 					return `${s}px`;
 				},
 			},
+			force3D: true,
 		});
 
-		const center = window.innerWidth * 0.635;
+		const center = window.innerWidth * SNAP_POINT_RATIO;
 
 		items.current.forEach((el) => {
 			if (!el) return;
@@ -84,36 +86,36 @@ export default function Carousel() {
 			gsap.to(image, {
 				scale,
 				x: offsetX,
-				duration: 0.8,
-				ease: 'snappy',
+				duration: 1,
+				ease: 'snap',
 				overwrite: 'auto',
 				transformOrigin: 'left top',
 			});
 
 			gsap.to(content, {
 				x: offsetX,
-				duration: 0.8,
-				ease: 'snappy',
+				duration: 1,
+				ease: 'snap',
 				overwrite: 'auto',
 			});
 
 			gsap.to(title, {
 				opacity,
 				scale: 0.5,
-				duration: 0.8,
-				ease: 'snappy',
+				duration: 1,
+				ease: 'snap',
 				overwrite: 'auto',
 			});
 		});
 	};
 
 	const onWheel = (e) => {
-		scrollObj.current.target -= e.deltaY;
+		scrollObj.current.target -= e.deltaY * 1.5;
 	};
 
 	const onResize = () => {
 		listWidth.current = list.current.clientWidth;
-		itemWidth.current = ((240 + GAP) / 1920) * window.innerWidth;
+		itemWidth.current = ((272 + GAP) / 1920) * window.innerWidth;
 		scrollerWidth.current = items.current.length * itemWidth.current;
 	};
 
@@ -122,14 +124,14 @@ export default function Carousel() {
 
 		translate.current = lerp(translate.current, scrollObj.current.target, 0.06);
 
-		const snapPointRatio = 0.635;
+		const snapPointRatio = SNAP_POINT_RATIO;
 
 		if (!isDragging.current) {
 			const snapPointX = window.innerWidth * snapPointRatio;
 			const center = translate.current + snapPointX;
 			const index = Math.round((center - itemWidth.current / 2) / itemWidth.current);
 			const snapTarget = index * itemWidth.current - snapPointX + itemWidth.current / 2 + GAP / 2;
-			scrollObj.current.target = lerp(scrollObj.current.target, snapTarget, 0.06);
+			scrollObj.current.target = lerp(scrollObj.current.target, snapTarget, 0.1);
 		}
 
 		dispose(translate.current);
@@ -137,9 +139,9 @@ export default function Carousel() {
 		scrollObj.current.speed = translate.current - scrollObj.current.current;
 		scrollObj.current.current = translate.current;
 
-		gsap.to(items.current, {
-			scale: 1 - Math.min(100, Math.abs(scrollObj.current.speed)) * 0.005,
-		});
+		// gsap.to(items.current, {
+		// 	scale: 1 - Math.min(100, Math.abs(scrollObj.current.speed)) * 0.005,
+		// });
 	};
 
 	const onTouchStart = (e) => {
@@ -197,13 +199,13 @@ export default function Carousel() {
 	}, []);
 
 	return (
-		<main className='h-screen w-full overflow-clip fixed bg-zinc-950' ref={wrapper}>
+		<main className='h-screen w-full overflow-clip fixed' ref={wrapper}>
 			{/* <div className='fixed top-0 left-[calc((1219/1920)*100vw)] w-px h-full bg-red-500 z-50 pointer-events-none' /> */}
 			<div className='flex items-start select-none pointer-events-none absolute inset-0 pt-[20vh]'>
 				<div className='relative slides flex items-start w-full pointer-events-auto' ref={list}>
 					{slides.map((slide, idx) => (
 						<div className='group absolute' key={slide.id} ref={(ref) => (items.current[idx] = ref)}>
-							<div className='pt-[135%] relative origin-top cursor-pointer'>
+							<div className='pt-[125%] relative origin-top cursor-pointer'>
 								<div className='item-content absolute left-0 bottom-full w-full pb-0.5'>
 									<div className='text-zinc-100 text-sm'>
 										{slide.id < 10 ? '0' + slide.id : slide.id}.
