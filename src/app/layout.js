@@ -1,5 +1,8 @@
 import { DM_Mono } from 'next/font/google';
 import './globals.css';
+import { Providers } from './providers';
+import { Link } from 'next-transition-router';
+import { ActiveItemContextProvider } from '@/context/ActiveItemContextProvider';
 
 const monoFont = DM_Mono({
 	variable: '--font-mono',
@@ -15,7 +18,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang='en'>
-			<body className={`${monoFont.variable} ${monoFont.className} antialiased`}>{children}</body>
+			<body className={`${monoFont.variable} ${monoFont.className} antialiased`}>
+				<ActiveItemContextProvider>
+					<Providers>
+						{children}
+						<div className='fixed z-[9999999999] left-6 bottom-6 uppercase'>
+							<Link href='/'>Carousel</Link> / <Link href='/list'>List</Link>
+						</div>
+					</Providers>
+				</ActiveItemContextProvider>
+			</body>
 		</html>
 	);
 }

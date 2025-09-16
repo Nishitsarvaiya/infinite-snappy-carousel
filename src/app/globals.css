@@ -30,7 +30,7 @@ body {
 }
 @media (max-aspect-ratio: 9007199254740992/5404319552844595) {
 	.slides-wrap {
-		padding-top: 15rem;
+		padding-top: 15vh;
 	}
 }
 .slide {

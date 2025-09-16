@@ -1,13 +1,14 @@
 'use client';
 
 import gsap from 'gsap';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useActiveItem } from '@/context/ActiveItemContextProvider';
 
-// Utility functions (you'll need to implement these)
 import Image from 'next/image';
-import { getBounds, lerp } from '../lib/utils'; // Linear interpolation
+import { getBounds } from '../lib/utils';
+import { ITEMS } from '@/lib/constants';
 
-export default function InfiniteHorizontalCarousel({ items }) {
+export default function InfiniteHorizontalCarousel() {
 	const containerRef = useRef(null);
 	const slideRefs = useRef([]);
 	const contentRefs = useRef([]);
@@ -19,27 +20,22 @@ export default function InfiniteHorizontalCarousel({ items }) {
 	const t = useRef(0);
 	const tc = useRef(0);
 	const tl = useRef(0);
-	const last = useRef(0);
 	const current = useRef(3);
-	const [loaded, setLoaded] = useState(false);
-	const [isResizing, setIsResizing] = useState(false);
 	const st = useRef(null);
+	const resizing = useRef(false);
 	const reverse = useRef(false);
-	const active = useRef(false);
-	const forwards = useRef(true);
 	const max = useRef(0);
-	const of = useRef(0);
 	const scrolling = useRef(false);
 	const snapToClosest = useRef(() => 0);
 	const snapWidth = useRef(() => 0);
 	const increase = useRef(0);
+	const { setActiveIndex } = useActiveItem();
 
 	useEffect(() => {
 		requestAnimationFrame(() => {
 			resize();
 			bindEvents();
 			classes();
-			setLoaded(true);
 		});
 
 		return () => {
@@ -51,10 +47,8 @@ export default function InfiniteHorizontalCarousel({ items }) {
 		if (!cache.current) return;
 		cache.current.forEach((slide, i) => {
 			if (!slide.visible) return;
-			// big class
 			if (i === current.current) slide.el.classList.add('is-big');
 			else slide.el.classList.remove('is-big');
-			// left/right classes based on progress
 			if (slide.p > 0.5) {
 				slide.el.classList.add('is-left');
 				slide.el.classList.remove('is-right');
@@ -66,13 +60,13 @@ export default function InfiniteHorizontalCarousel({ items }) {
 	};
 
 	const bindEvents = () => {
-		containerRef.current.addEventListener('resize', resize);
-		containerRef.current.addEventListener('wheel', scroll);
+		window.addEventListener('resize', resize);
+		window.addEventListener('wheel', scroll);
 	};
 
 	const unbindEvents = () => {
-		containerRef.current.removeEventListener('resize', resize);
-		containerRef.current.removeEventListener('wheel', scroll);
+		window.removeEventListener('resize', resize);
+		window.removeEventListener('wheel', scroll);
 	};
 
 	const scroll = (e) => {
@@ -104,10 +98,6 @@ export default function InfiniteHorizontalCarousel({ items }) {
 		t.current = snapWidth.current(t.current);
 	};
 
-	const clamp = () => {
-		t.current = gsap.utils.clamp(0, max.current, t.current);
-	};
-
 	const visible = (t, s, e) => e > t && e < s;
 
 	const applyTransforms = () => {
@@ -120,7 +110,7 @@ export default function InfiniteHorizontalCarousel({ items }) {
 				slide.p = gsap.utils.clamp(0, 1, (slide.t - center) / (left - center));
 				slide.visible = visible(left - window.innerWidth - width, right + width, slide.t);
 
-				if (slide.visible || isResizing) {
+				if (slide.visible || resizing.current) {
 					if (slide.out) {
 						slide.out = false;
 						show(slide);
@@ -138,7 +128,8 @@ export default function InfiniteHorizontalCarousel({ items }) {
 	};
 
 	const resize = () => {
-		setIsResizing(true);
+		resizing.current = true;
+		snaps.current = [];
 		const slides = slideRefs.current;
 		const lastIndex = slides.length - 1;
 		if (cache.current) {
@@ -191,7 +182,7 @@ export default function InfiniteHorizontalCarousel({ items }) {
 		requestAnimationFrame(() => {
 			max.current = cache.current[cache.current.length - 1].bounds.right;
 			snapToClosest.current = gsap.utils.snap(snaps.current);
-			setIsResizing(false);
+			resizing.current = false;
 		});
 	};
 
@@ -199,7 +190,7 @@ export default function InfiniteHorizontalCarousel({ items }) {
 		const ratio = gsap.ticker.deltaRatio();
 		tc.current = gsap.utils.interpolate(tc.current, t.current, 0.1 * ratio);
 		const diff = gsap.utils.clamp(0, 1, 1 - Math.abs(0.001 * (t.current - tc.current)));
-		containerRef.current.style.setProperty('--diff', diff);
+		containerRef.current && containerRef.current.style.setProperty('--diff', diff);
 		idx();
 		applyTransforms();
 	};
@@ -222,6 +213,27 @@ export default function InfiniteHorizontalCarousel({ items }) {
 		return () => gsap.ticker.remove(tick);
 	}, []);
 
+	const handleClick = (index) => {
+		setActiveIndex(index);
+		const center = window.innerWidth / 2 + increase.current / 2;
+		const slide = cache.current[index];
+		const rect = slide.bounds;
+		const isLeft = rect ? rect.left + rect.width / 2 < window.innerWidth / 2 : false;
+		const L = max.current || 0;
+		const targetSnap = snaps.current[index];
+		if (!L) {
+			t.current = targetSnap - center;
+			return;
+		}
+		const curr = gsap.utils.wrap(0, L, t.current + center - 5);
+		let delta = targetSnap - curr;
+		delta = ((delta + L / 2) % L) - L / 2;
+		if (isLeft && delta < 0) delta += L;
+		if (!isLeft && delta > 0) delta -= L;
+		if (Math.abs(delta) > L / 2) delta += delta > 0 ? -L : L;
+		t.current += delta;
+	};
+
 	return (
 		<div className='fixed inset-0 flex overflow-hidden' ref={containerRef}>
 			<div
@@ -231,10 +243,11 @@ export default function InfiniteHorizontalCarousel({ items }) {
 				style={{ position: 'relative', width: '100%' }}
 			>
 				<div className='relative slides flex items-start w-full pointer-events-auto'>
-					{items.map((item, i) => (
-						<article
+					{ITEMS.map((item, i) => (
+						<div
 							key={i}
 							ref={(el) => (slideRefs.current[i] = el)}
+							onClick={() => handleClick(i)}
 							className={`group relative slide js-i-slide-parent${i === 3 ? ' is-big' : ''}${
 								i < 3 ? ' is-left' : ''
 							}${i > 3 ? ' is-right' : ''}`}
@@ -260,12 +273,8 @@ export default function InfiniteHorizontalCarousel({ items }) {
 										i !== 3 ? ' overflow-hidden' : ''
 									}${i === 3 ? ' is-i-big js-i-scale' : ''}`}
 								>
-									<div
-										className={`absolute inset-0 origin-top overflow-hidden js-i-slide-mask${
-											i === 3 ? ' js-i-flip' : ''
-										}`}
-									>
-										<div className='absolute inset-0 overflow-hidden js-i-slide-mask-inside'>
+									<div className='absolute inset-0 origin-top overflow-hidden'>
+										<div className='absolute inset-0 overflow-hidden'>
 											<div className='absolute inset-0 media-fill'>
 												<Image
 													className='js-t-stack-item js-t-flip'
@@ -283,7 +292,7 @@ export default function InfiniteHorizontalCarousel({ items }) {
 									</div>
 								</div>
 							</div>
-						</article>
+						</div>
 					))}
 				</div>
 			</div>
