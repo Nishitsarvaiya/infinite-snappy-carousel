@@ -15,7 +15,10 @@ export default function List() {
 		const stackEnd = document.querySelector('.js-t-stack-end');
 		const stackItems = document.querySelectorAll('.js-t-stack-item');
 		stackItemsRef.current = Array.from(stackItems);
-		maxZ.current = stackItemsRef.current.length;
+		maxZ.current = stackItemsRef.current.reduce((acc, el) => {
+			const zi = parseInt(window.getComputedStyle(el).zIndex || '0', 10);
+			return Math.max(acc, isNaN(zi) ? 0 : zi);
+		}, stackItemsRef.current.length);
 		const textItems = document.querySelectorAll('.js-item-text');
 
 		if (!stackEnd || stackItems.length === 0) return;
@@ -37,17 +40,14 @@ export default function List() {
 			});
 		});
 
-		gsap.fromTo(
-			textItems,
-			{ yPercent: 100 },
-			{
-				yPercent: 0,
-				duration: 1.25,
-				ease: 'smoothy',
-				stagger: 0.075,
-				delay: 0.5,
-			}
-		);
+		gsap.to(textItems, {
+			y: 0,
+			opacity: 1,
+			duration: 1.25,
+			ease: 'smoothy',
+			stagger: 0.075,
+			delay: 0.5,
+		});
 	}, []);
 
 	const handleClick = (index) => {
@@ -59,37 +59,35 @@ export default function List() {
 	};
 
 	return (
-		<div className='fixed inset-0 flex items-end overflow-hidden'>
-			<div className='absolute inset-0 pointer-events-none z-2'>
-				<div className='js-grid grid grid-cols-12 gap-6 pt-[calc((160/1920)*100vw)] px-12'>
-					<div className='col-span-2'>
-						<div className='relative'>
-							<div className='pt-[125%]'>
-								<div className='absolute inset-0 media-fill js-t-stack-end'></div>
-							</div>
+		<div className='absolute inset-0 pointer-events-none z-2'>
+			<div className='js-grid grid grid-cols-12 gap-10 lg:gap-6 pt-20 lg:pt-[calc((160/1920)*100vw)] px-[calc((64/1920)*100vw)]'>
+				<div className='col-span-5 lg:col-span-2'>
+					<div className='relative'>
+						<div className='pt-[125%]'>
+							<div className='absolute inset-0 media-fill js-t-stack-end'></div>
 						</div>
 					</div>
-					<div className='col-start-5 -col-end-1'>
-						<div className='flex flex-wrap gap-x-4'>
-							{PROJECTS.map((item, i) => (
-								<div
-									key={item.id}
-									className={`text-[calc((64/1920)*100vw)] font-semibold leading-tight overflow-hidden cursor-pointer pointer-events-auto group`}
-									onClick={() => handleClick(i)}
-								>
-									<div className='js-item-text'>
-										<div
-											className={`${
-												activeIndex !== null && i === activeIndex ? 'opacity-100' : 'opacity-25'
-											} group-hover:opacity-100 duration-200`}
-										>
-											{item.title}
-											{i !== PROJECTS.length - 1 && ','}
-										</div>
+				</div>
+				<div className='col-span-full lg:col-start-5 lg:-col-end-1'>
+					<div className='flex flex-wrap gap-x-4'>
+						{PROJECTS.map((item, i) => (
+							<div
+								key={item.id}
+								className={`text-2xl lg:text-[calc((64/1920)*100vw)] font-semibold leading-tight overflow-hidden cursor-pointer pointer-events-auto group`}
+								onClick={() => handleClick(i)}
+							>
+								<div className='translate-y-full js-item-text'>
+									<div
+										className={`${
+											activeIndex !== null && i === activeIndex ? 'opacity-100' : 'opacity-25'
+										} group-hover:opacity-100 duration-200`}
+									>
+										{item.title}
+										{i !== PROJECTS.length - 1 && ','}
 									</div>
 								</div>
-							))}
-						</div>
+							</div>
+						))}
 					</div>
 				</div>
 			</div>

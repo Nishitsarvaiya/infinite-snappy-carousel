@@ -30,6 +30,8 @@ export default function InfiniteHorizontalCarousel() {
 	const snapWidth = useRef(() => 0);
 	const increase = useRef(0);
 	const { setActiveIndex } = useActiveItem();
+	const touchStartX = useRef(null);
+	const lastTouchX = useRef(null);
 
 	useEffect(() => {
 		requestAnimationFrame(() => {
@@ -62,11 +64,17 @@ export default function InfiniteHorizontalCarousel() {
 	const bindEvents = () => {
 		window.addEventListener('resize', resize);
 		window.addEventListener('wheel', scroll);
+		window.addEventListener('touchstart', onTouchStart, { passive: true });
+		window.addEventListener('touchmove', onTouchMove, { passive: false });
+		window.addEventListener('touchend', onTouchEnd, { passive: true });
 	};
 
 	const unbindEvents = () => {
 		window.removeEventListener('resize', resize);
 		window.removeEventListener('wheel', scroll);
+		window.removeEventListener('touchstart', onTouchStart);
+		window.removeEventListener('touchmove', onTouchMove);
+		window.removeEventListener('touchend', onTouchEnd);
 	};
 
 	const scroll = (e) => {
@@ -79,6 +87,37 @@ export default function InfiniteHorizontalCarousel() {
 			snap();
 		}, 100);
 		scrolling.current = true;
+	};
+
+	const onTouchStart = (e) => {
+		if (!e.touches || e.touches.length === 0) return;
+		touchStartX.current = e.touches[0].clientX;
+		lastTouchX.current = touchStartX.current;
+		tl.current = t.current;
+		scrolling.current = true;
+		clearTimeout(st.current);
+	};
+
+	const onTouchMove = (e) => {
+		if (lastTouchX.current == null) return;
+		const x = e.touches && e.touches[0] ? e.touches[0].clientX : lastTouchX.current;
+		const dx = x - lastTouchX.current;
+		t.current -= dx;
+		reverse.current = tl.current > t.current;
+		lastTouchX.current = x;
+		e.preventDefault();
+		clearTimeout(st.current);
+		st.current = setTimeout(() => {
+			scrolling.current = false;
+			snap();
+		}, 100);
+	};
+
+	const onTouchEnd = () => {
+		lastTouchX.current = null;
+		touchStartX.current = null;
+		scrolling.current = false;
+		snap();
 	};
 
 	const idx = () => {
@@ -261,7 +300,7 @@ export default function InfiniteHorizontalCarousel() {
 							>
 								<div className='flex flex-col js-i-slide-text'>
 									<div className='slide__index mb-4'>{(i + 1 > 9 ? '' : '0') + (i + 1) + '.'}</div>
-									<h2 className='leading-none text-2xl mb-2'>{item.title}</h2>
+									<h2 className='leading-none text-responsive-sm mb-2'>{item.title}</h2>
 									<div className='leading-none uppercase'>[ {item.type} ]</div>
 								</div>
 							</div>

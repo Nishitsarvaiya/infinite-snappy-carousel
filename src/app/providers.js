@@ -54,6 +54,8 @@ export function Providers({ children }) {
 				if (to === '/list') {
 					const stackStart = document.querySelector('.js-t-stack-start');
 					const stackItems = document.querySelectorAll('.js-t-stack-item');
+					const slideTexts = document.querySelectorAll('.js-i-slide-text');
+
 					stackItems.forEach((item, i) => {
 						if (item.closest('.is-big')) {
 							setActiveIndex(i);
@@ -82,6 +84,12 @@ export function Providers({ children }) {
 								}
 							},
 						});
+					});
+
+					gsap.to(slideTexts, {
+						opacity: 0,
+						duration: 0.5,
+						ease: 'smoothy',
 					});
 				} else if (to === '/') {
 					const stackStart = document.querySelector('.js-t-stack-start');

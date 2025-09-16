@@ -20,29 +20,31 @@ export default function Header() {
 		return () => ctx.revert();
 	}, []);
 	return (
-		<header ref={headerRef} className='fixed top-0 left-0 right-0 pt-10 px-16'>
+		<header ref={headerRef} className='fixed top-0 left-0 right-0 pt-6 lg:pt-10 px-[calc((64/1920)*100vw)]'>
 			<div className='flex items-center justify-between js-header-fade'>
-				<div className='text-2xl js-header-fade'>3D, Motion, Art direction</div>
-				<nav role='navigation' aria-label='Primary' className='js-header-fade'>
+				<div className='text-responsive-sm js-header-fade'>3D, Motion, Art direction</div>
+				<nav role='navigation' aria-label='Primary' className='js-header-fade hidden lg:block'>
 					<ul role='menubar' className='flex items-center gap-2'>
-						<li role='menuitem' className='text-2xl'>
+						<li role='menuitem' className='text-responsive-sm'>
 							Index,
 						</li>
-						<li role='menuitem' className='text-2xl'>
+						<li role='menuitem' className='text-responsive-sm'>
 							Patreon,
 						</li>
-						<li role='menuitem' className='text-2xl'>
+						<li role='menuitem' className='text-responsive-sm'>
 							Store,
 						</li>
-						<li role='menuitem' className='text-2xl'>
+						<li role='menuitem' className='text-responsive-sm'>
 							About,
 						</li>
-						<li role='menuitem' className='text-2xl'>
+						<li role='menuitem' className='text-responsive-sm'>
 							Lab
 						</li>
 					</ul>
 				</nav>
-				<div className='text-2xl underline underline-offset-8 js-header-fade'>Send me a message</div>
+				<div className='text-responsive-sm underline underline-offset-8 js-header-fade hidden lg:block'>
+					Send me a message
+				</div>
 				<button className='lg:hidden js-header-fade' aria-label='Open/Close Navigation' aria-expanded='false'>
 					Menu
 				</button>

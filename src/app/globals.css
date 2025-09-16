@@ -32,7 +32,7 @@ body {
 	}
 }
 .slide {
-	--width: 100%;
+	--width: 80%;
 	min-width: var(--width);
 	max-width: var(--width);
 }
@@ -92,4 +92,8 @@ body {
 	.is-not-visible .slide__scale {
 		transition: none;
 	}
+}
+
+.text-responsive-sm {
+	font-size: clamp(14px, calc((24 / 1920) * 100vw), 32px);
 }

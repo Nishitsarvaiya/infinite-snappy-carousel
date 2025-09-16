@@ -34,9 +34,9 @@ export default function Footer() {
 		return () => ctx.revert();
 	}, []);
 	return (
-		<footer ref={footerRef} className='w-full px-16'>
+		<footer ref={footerRef} className='w-full px-[calc((64/1920)*100vw)]'>
 			<div className='flex items-center justify-between js-footer-fade mb-6'>
-				<div className='flex items-center gap-1 text-2xl font-medium js-footer-fade'>
+				<div className='flex items-center gap-1 text-responsive-sm font-medium js-footer-fade'>
 					<Link href='/' className={`${pathname === '/' ? 'opacity-100' : 'opacity-25'}`}>
 						Carousel,
 					</Link>
@@ -44,10 +44,10 @@ export default function Footer() {
 						List
 					</Link>
 				</div>
-				<div className='text-2xl js-footer-fade'>London, UK 17:21</div>
+				<div className='text-responsive-sm js-footer-fade'>London, UK 17:21</div>
 			</div>
 			<div className='w-full flex items-center whitespace-nowrap text-[16.25vw] leading-[14vw] max-w-full uppercase overflow-y-clip'>
-				<div className='-ml-5 js-footer-split'>
+				<div className='js-footer-split'>
 					Ross<span className='italic tracking-tighter'>mason</span>
 				</div>
 			</div>
