@@ -4,13 +4,15 @@ import { useActiveItem } from '@/context/ActiveItemContextProvider';
 import gsap from 'gsap';
 import CustomEase from 'gsap/CustomEase';
 import { Flip } from 'gsap/Flip';
+import { SplitText } from 'gsap/SplitText';
 import { TransitionRouter } from 'next-transition-router';
 import { usePathname } from 'next/navigation';
-gsap.registerPlugin(Flip, CustomEase);
+gsap.registerPlugin(Flip, CustomEase, SplitText);
 CustomEase.create(
 	'snappy',
 	'M0,0 C0.094,0.026 0.124,0.127 0.157,0.29 0.197,0.486 0.254,0.8 0.348,0.884 0.42,0.949 0.374,1 1,1 '
 );
+CustomEase.create('smoothy', '.075,.82,.165,1');
 
 export function Providers({ children }) {
 	const pathname = usePathname();
@@ -24,21 +26,14 @@ export function Providers({ children }) {
 					const stackItems = document.querySelectorAll('.js-t-stack-item');
 
 					stackItems.forEach((item, i) => {
-						// record Flip state
 						const state = Flip.getState(item);
-
-						// move to new container
 						stackEnd.appendChild(item);
-
-						// restore zIndex so previously active stays on top
 						gsap.set(item, {
 							zIndex:
 								activeIndex !== null && i === activeIndex
 									? stackItems.length + 1
 									: stackItems.length - i,
 						});
-
-						// animate from old state
 						Flip.from(state, {
 							absolute: true,
 							scale: true,
@@ -87,6 +82,16 @@ export function Providers({ children }) {
 								}
 							},
 						});
+					});
+				} else if (to === '/') {
+					const stackStart = document.querySelector('.js-t-stack-start');
+					const itemGrid = document.querySelector('.js-grid');
+					console.log();
+					gsap.to([stackStart, itemGrid], {
+						opacity: 0,
+						duration: 0.5,
+						ease: 'smoothy',
+						onComplete: () => next(),
 					});
 				} else {
 					next();

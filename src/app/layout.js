@@ -1,13 +1,20 @@
-import { DM_Mono } from 'next/font/google';
+import { DM_Mono, Hanken_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { Link } from 'next-transition-router';
 import { ActiveItemContextProvider } from '@/context/ActiveItemContextProvider';
+import MainLayout from '@/components/layout/MainLayout';
 
 const monoFont = DM_Mono({
 	variable: '--font-mono',
 	subsets: ['latin'],
 	weight: ['400'],
+});
+
+const groteskFont = Hanken_Grotesk({
+	variable: '--font-grotesk',
+	subsets: ['latin'],
+	weight: ['400', '500', '600', '700'],
 });
 
 export const metadata = {
@@ -18,15 +25,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
 	return (
 		<html lang='en'>
-			<body className={`${monoFont.variable} ${monoFont.className} antialiased`}>
-				<ActiveItemContextProvider>
-					<Providers>
-						{children}
-						<div className='fixed z-[9999999999] left-6 bottom-6 uppercase'>
-							<Link href='/'>Carousel</Link> / <Link href='/list'>List</Link>
-						</div>
-					</Providers>
-				</ActiveItemContextProvider>
+			<body className={`${monoFont.variable} ${groteskFont.variable} ${groteskFont.className} antialiased`}>
+				<MainLayout>{children}</MainLayout>
 			</body>
 		</html>
 	);

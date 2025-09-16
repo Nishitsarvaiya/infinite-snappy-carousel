@@ -5,8 +5,8 @@ import { useEffect, useRef } from 'react';
 import { useActiveItem } from '@/context/ActiveItemContextProvider';
 
 import Image from 'next/image';
-import { getBounds } from '../lib/utils';
-import { ITEMS } from '@/lib/constants';
+import { getBounds } from '../../lib/utils';
+import { PROJECTS } from '@/lib/constants';
 
 export default function InfiniteHorizontalCarousel() {
 	const containerRef = useRef(null);
@@ -235,66 +235,63 @@ export default function InfiniteHorizontalCarousel() {
 	};
 
 	return (
-		<div className='fixed inset-0 flex overflow-hidden' ref={containerRef}>
-			<div
-				className={`flex items-start slides-wrap select-none pointer-events-none absolute inset-0${
-					reverse ? ' is-reverse' : ''
-				}`}
-				style={{ position: 'relative', width: '100%' }}
-			>
-				<div className='relative slides flex items-start w-full pointer-events-auto'>
-					{ITEMS.map((item, i) => (
+		<div
+			className={`flex items-start slides-wrap select-none pointer-events-none absolute inset-0${
+				reverse ? ' is-reverse' : ''
+			}`}
+			ref={containerRef}
+		>
+			<div className='relative slides flex items-start w-full pointer-events-auto'>
+				{PROJECTS.map((item, i) => (
+					<div
+						key={i}
+						ref={(el) => (slideRefs.current[i] = el)}
+						onClick={() => handleClick(i)}
+						className={`group relative slide js-i-slide-parent${i === 3 ? ' is-big' : ''}${
+							i < 3 ? ' is-left' : ''
+						}${i > 3 ? ' is-right' : ''}`}
+					>
 						<div
-							key={i}
-							ref={(el) => (slideRefs.current[i] = el)}
-							onClick={() => handleClick(i)}
-							className={`group relative slide js-i-slide-parent${i === 3 ? ' is-big' : ''}${
-								i < 3 ? ' is-left' : ''
-							}${i > 3 ? ' is-right' : ''}`}
+							ref={(el) => (contentRefs.current[i] = el)}
+							className='slide__content pt-[125%] relative origin-top cursor-pointer'
 						>
 							<div
-								ref={(el) => (contentRefs.current[i] = el)}
-								className='slide__content pt-[125%] relative origin-top cursor-pointer'
+								ref={(el) => (textRefs.current[i] = el)}
+								className='slide__text absolute left-0 bottom-full w-full pb-4'
 							>
-								<div
-									ref={(el) => (textRefs.current[i] = el)}
-									className='slide__text absolute left-0 bottom-full w-full pb-4'
-								>
-									<div className='flex flex-col js-i-slide-text'>
-										<div className='slide__index mb-4'>
-											{(i + 1 > 9 ? '' : '0') + (i + 1) + '.'}
-										</div>
-										<h2 className='leading-none uppercase'>{item.title}</h2>
-									</div>
+								<div className='flex flex-col js-i-slide-text'>
+									<div className='slide__index mb-4'>{(i + 1 > 9 ? '' : '0') + (i + 1) + '.'}</div>
+									<h2 className='leading-none text-2xl mb-2'>{item.title}</h2>
+									<div className='leading-none uppercase'>[ {item.type} ]</div>
 								</div>
-								<div
-									ref={(el) => (scaleRefs.current[i] = el)}
-									className={`slide__scale absolute origin-top inset-0 js-i-slide js-slide-content${
-										i !== 3 ? ' overflow-hidden' : ''
-									}${i === 3 ? ' is-i-big js-i-scale' : ''}`}
-								>
-									<div className='absolute inset-0 origin-top overflow-hidden'>
-										<div className='absolute inset-0 overflow-hidden'>
-											<div className='absolute inset-0 media-fill'>
-												<Image
-													className='js-t-stack-item js-t-flip'
-													src={item.image}
-													alt=''
-													fill
-													style={{
-														objectFit: 'cover',
-														objectPosition: 'center',
-													}}
-													draggable={false}
-												/>
-											</div>
+							</div>
+							<div
+								ref={(el) => (scaleRefs.current[i] = el)}
+								className={`slide__scale absolute origin-top inset-0 js-i-slide js-slide-content${
+									i !== 3 ? ' overflow-hidden' : ''
+								}${i === 3 ? ' is-i-big js-i-scale' : ''}`}
+							>
+								<div className='absolute inset-0 origin-top overflow-hidden'>
+									<div className='absolute inset-0 overflow-hidden'>
+										<div className='absolute inset-0 media-fill'>
+											<Image
+												className='js-t-stack-item js-t-flip'
+												src={item.image}
+												alt=''
+												fill
+												style={{
+													objectFit: 'cover',
+													objectPosition: 'center',
+												}}
+												draggable={false}
+											/>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					))}
-				</div>
+					</div>
+				))}
 			</div>
 		</div>
 	);
