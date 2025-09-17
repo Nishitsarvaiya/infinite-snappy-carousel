@@ -1,7 +1,7 @@
 'use client';
 
 import gsap from 'gsap';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useActiveItem } from '@/context/ActiveItemContextProvider';
 
 import Image from 'next/image';
@@ -9,6 +9,7 @@ import { getBounds } from '../../lib/utils';
 import { PROJECTS } from '@/lib/constants';
 
 export default function InfiniteHorizontalCarousel() {
+	const { activeIndex, setActiveIndex } = useActiveItem();
 	const containerRef = useRef(null);
 	const slideRefs = useRef([]);
 	const contentRefs = useRef([]);
@@ -20,7 +21,7 @@ export default function InfiniteHorizontalCarousel() {
 	const t = useRef(0);
 	const tc = useRef(0);
 	const tl = useRef(0);
-	const current = useRef(3);
+	const current = useRef(activeIndex);
 	const st = useRef(null);
 	const resizing = useRef(false);
 	const reverse = useRef(false);
@@ -29,15 +30,16 @@ export default function InfiniteHorizontalCarousel() {
 	const snapToClosest = useRef(() => 0);
 	const snapWidth = useRef(() => 0);
 	const increase = useRef(0);
-	const { setActiveIndex } = useActiveItem();
 	const touchStartX = useRef(null);
 	const lastTouchX = useRef(null);
 
 	useEffect(() => {
+		gsap.ticker.add(tick);
 		requestAnimationFrame(() => {
 			resize();
 			bindEvents();
 			classes();
+			handleClick(activeIndex);
 
 			gsap.to('.js-i-slide-mask-inside', {
 				clipPath: 'inset(0% 0% 0% 0%)',
@@ -50,6 +52,7 @@ export default function InfiniteHorizontalCarousel() {
 
 		return () => {
 			unbindEvents();
+			gsap.ticker.remove(tick);
 		};
 	}, []);
 
@@ -131,7 +134,8 @@ export default function InfiniteHorizontalCarousel() {
 	const idx = () => {
 		if (snapToClosest.current) {
 			const center = window.innerWidth / 2 + increase.current / 2;
-			const wrapped = gsap.utils.wrap(0, max.current, tc.current + center);
+			const wrapped = gsap.utils.wrap(0, max.current, tc.current + center - 5);
+			console.log(wrapped);
 			const snap = snapToClosest.current(wrapped);
 			const newCurrent = snaps.current.indexOf(snap);
 			if (newCurrent !== current.current) {
@@ -255,11 +259,6 @@ export default function InfiniteHorizontalCarousel() {
 		slide.el.style.transform = `translate3d(${-offset}px, 0, 0)`;
 	};
 
-	useEffect(() => {
-		gsap.ticker.add(tick);
-		return () => gsap.ticker.remove(tick);
-	}, []);
-
 	const handleClick = (index) => {
 		setActiveIndex(index);
 		const center = window.innerWidth / 2 + increase.current / 2;
@@ -294,9 +293,9 @@ export default function InfiniteHorizontalCarousel() {
 						key={i}
 						ref={(el) => (slideRefs.current[i] = el)}
 						onClick={() => handleClick(i)}
-						className={`group relative slide ${i === 3 ? ' is-big' : ''}${i < 3 ? ' is-left' : ''}${
-							i > 3 ? ' is-right' : ''
-						}`}
+						className={`group relative slide ${i === activeIndex ? ' is-big' : ''}${
+							i < activeIndex ? ' is-left' : ''
+						}${i > activeIndex ? ' is-right' : ''}`}
 					>
 						<div
 							ref={(el) => (contentRefs.current[i] = el)}
