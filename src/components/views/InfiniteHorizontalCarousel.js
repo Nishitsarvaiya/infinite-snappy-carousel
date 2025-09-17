@@ -38,6 +38,14 @@ export default function InfiniteHorizontalCarousel() {
 			resize();
 			bindEvents();
 			classes();
+
+			gsap.to('.js-i-slide-mask-inside', {
+				clipPath: 'inset(0% 0% 0% 0%)',
+				scale: 1,
+				duration: 3,
+				ease: 'snappy',
+				stagger: 0.075,
+			});
 		});
 
 		return () => {
@@ -123,7 +131,7 @@ export default function InfiniteHorizontalCarousel() {
 	const idx = () => {
 		if (snapToClosest.current) {
 			const center = window.innerWidth / 2 + increase.current / 2;
-			const wrapped = gsap.utils.wrap(0, max.current, tc.current + center - 5);
+			const wrapped = gsap.utils.wrap(0, max.current, tc.current + center);
 			const snap = snapToClosest.current(wrapped);
 			const newCurrent = snaps.current.indexOf(snap);
 			if (newCurrent !== current.current) {
@@ -286,9 +294,9 @@ export default function InfiniteHorizontalCarousel() {
 						key={i}
 						ref={(el) => (slideRefs.current[i] = el)}
 						onClick={() => handleClick(i)}
-						className={`group relative slide js-i-slide-parent${i === 3 ? ' is-big' : ''}${
-							i < 3 ? ' is-left' : ''
-						}${i > 3 ? ' is-right' : ''}`}
+						className={`group relative slide ${i === 3 ? ' is-big' : ''}${i < 3 ? ' is-left' : ''}${
+							i > 3 ? ' is-right' : ''
+						}`}
 					>
 						<div
 							ref={(el) => (contentRefs.current[i] = el)}
@@ -310,14 +318,15 @@ export default function InfiniteHorizontalCarousel() {
 									i !== 3 ? ' overflow-hidden' : ''
 								}${i === 3 ? ' is-i-big js-i-scale' : ''}`}
 							>
-								<div className='absolute inset-0 origin-top overflow-hidden'>
-									<div className='absolute inset-0 overflow-hidden'>
+								<div className='absolute inset-0 origin-top overflow-hidden js-i-slide-mask'>
+									<div className='absolute inset-0 overflow-hidden js-i-slide-mask-inside'>
 										<div className='absolute inset-0 media-fill'>
 											<Image
-												className='js-t-stack-item js-t-flip'
+												className='js-t-stack-item'
 												src={item.image}
 												alt=''
 												fill
+												priority
 												style={{
 													objectFit: 'cover',
 													objectPosition: 'center',

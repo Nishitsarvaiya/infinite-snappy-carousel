@@ -15,6 +15,7 @@ export default function page() {
 							src={item.image}
 							alt=''
 							fill
+							priority
 							style={{ objectFit: 'cover', objectPosition: 'center' }}
 						/>
 					))}

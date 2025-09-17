@@ -4,6 +4,7 @@ import { Providers } from './providers';
 import { Link } from 'next-transition-router';
 import { ActiveItemContextProvider } from '@/context/ActiveItemContextProvider';
 import MainLayout from '@/components/layout/MainLayout';
+import { PROJECTS } from '@/lib/constants';
 
 const monoFont = DM_Mono({
 	variable: '--font-mono',

@@ -42,15 +42,18 @@ export function Providers({ children }) {
 							delay: 0.05 * i,
 							ease: 'snappy',
 							onComplete: () => {
+								document.documentElement && delete document.documentElement.dataset.spa;
 								next();
 							},
 						});
 					});
 				} else {
+					document.documentElement && delete document.documentElement.dataset.spa;
 					next();
 				}
 			}}
 			leave={(next, from, to) => {
+				document.documentElement && (document.documentElement.dataset.spa = '1');
 				if (to === '/list') {
 					const stackStart = document.querySelector('.js-t-stack-start');
 					const stackItems = document.querySelectorAll('.js-t-stack-item');

@@ -14,14 +14,24 @@ export default function List() {
 	useEffect(() => {
 		const stackEnd = document.querySelector('.js-t-stack-end');
 		const stackItems = document.querySelectorAll('.js-t-stack-item');
+		const textItems = document.querySelectorAll('.js-item-text');
 		stackItemsRef.current = Array.from(stackItems);
+
 		maxZ.current = stackItemsRef.current.reduce((acc, el) => {
 			const zi = parseInt(window.getComputedStyle(el).zIndex || '0', 10);
 			return Math.max(acc, isNaN(zi) ? 0 : zi);
 		}, stackItemsRef.current.length);
-		const textItems = document.querySelectorAll('.js-item-text');
 
-		if (!stackEnd || stackItems.length === 0) return;
+		gsap.to(textItems, {
+			y: 0,
+			opacity: 1,
+			duration: 1.25,
+			ease: 'smoothy',
+			stagger: 0.075,
+			delay: 0.5,
+		});
+
+		if (!stackEnd || stackItems.length === 0 || document.documentElement?.dataset?.spa === '1') return;
 
 		stackItems.forEach((item, i) => {
 			const state = Flip.getState(item);
@@ -38,15 +48,6 @@ export default function List() {
 				delay: 0.05 * i,
 				ease: 'snappy',
 			});
-		});
-
-		gsap.to(textItems, {
-			y: 0,
-			opacity: 1,
-			duration: 1.25,
-			ease: 'smoothy',
-			stagger: 0.075,
-			delay: 0.5,
 		});
 	}, []);
 
