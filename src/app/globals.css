@@ -41,6 +41,10 @@ body {
 	display: none;
 }
 
+.slide__content {
+	padding-top: 100%;
+}
+
 @media (max-aspect-ratio: 9007199254740992/5404319552844595) {
 	.slide__index {
 		display: block;
@@ -84,6 +88,9 @@ body {
 		transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
 		transform: translate3d(var(--x-text-output), 0, 0);
 	}
+	.slide__content {
+		padding-top: 125%;
+	}
 	@media (hover: hover) and (pointer: fine) {
 		.slide:hover .slide__text {
 			transform: translate3d(var(--x-text-output), -0.75rem, 0);
@@ -108,4 +115,21 @@ body {
 .js-i-slide-mask-inside {
 	clip-path: inset(0% 0% 100% 0%);
 	scale: 1.5;
+}
+
+.js-i-slide-text {
+	transform: translateY(-50%);
+	opacity: 0;
+}
+
+.mobile {
+	.slide {
+		--width: 100%;
+		min-width: var(--width);
+		max-width: var(--width);
+	}
+
+	.slide__content {
+		padding-top: 125%;
+	}
 }

@@ -1,12 +1,12 @@
 'use client';
 
-import gsap from 'gsap';
-import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useActiveItem } from '@/context/ActiveItemContextProvider';
+import gsap from 'gsap';
+import { useEffect, useRef } from 'react';
 
+import { PROJECTS } from '@/lib/constants';
 import Image from 'next/image';
 import { getBounds } from '../../lib/utils';
-import { PROJECTS } from '@/lib/constants';
 
 export default function InfiniteHorizontalCarousel() {
 	const { activeIndex, setActiveIndex } = useActiveItem();
@@ -44,6 +44,14 @@ export default function InfiniteHorizontalCarousel() {
 			gsap.to('.js-i-slide-mask-inside', {
 				clipPath: 'inset(0% 0% 0% 0%)',
 				scale: 1,
+				duration: 3,
+				ease: 'snappy',
+				stagger: 0.075,
+			});
+
+			gsap.to('.js-i-slide-text', {
+				yPercent: 0,
+				opacity: 1,
 				duration: 3,
 				ease: 'snappy',
 				stagger: 0.075,
@@ -135,7 +143,6 @@ export default function InfiniteHorizontalCarousel() {
 		if (snapToClosest.current) {
 			const center = window.innerWidth / 2 + increase.current / 2;
 			const wrapped = gsap.utils.wrap(0, max.current, tc.current + center - 5);
-			console.log(wrapped);
 			const snap = snapToClosest.current(wrapped);
 			const newCurrent = snaps.current.indexOf(snap);
 			if (newCurrent !== current.current) {
@@ -299,7 +306,7 @@ export default function InfiniteHorizontalCarousel() {
 					>
 						<div
 							ref={(el) => (contentRefs.current[i] = el)}
-							className='slide__content pt-[125%] relative origin-top cursor-pointer'
+							className='slide__content relative origin-top cursor-pointer'
 						>
 							<div
 								ref={(el) => (textRefs.current[i] = el)}

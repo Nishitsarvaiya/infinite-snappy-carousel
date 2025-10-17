@@ -97,7 +97,6 @@ export function Providers({ children }) {
 				} else if (to === '/') {
 					const stackStart = document.querySelector('.js-t-stack-start');
 					const itemGrid = document.querySelector('.js-grid');
-					console.log();
 					gsap.to([stackStart, itemGrid], {
 						opacity: 0,
 						duration: 0.5,
