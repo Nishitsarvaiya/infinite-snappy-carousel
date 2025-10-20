@@ -289,29 +289,19 @@ export default function InfiniteHorizontalCarousel() {
 
 	return (
 		<div
-			className={`flex items-start slides-wrap select-none pointer-events-none absolute inset-0${
-				reverse ? ' is-reverse' : ''
-			}`}
-			ref={containerRef}
-		>
+			className={`flex items-start slides-wrap select-none pointer-events-none absolute inset-0${reverse ? ' is-reverse' : ''}`}
+			ref={containerRef}>
 			<div className='relative slides flex items-start w-full pointer-events-auto'>
 				{PROJECTS.map((item, i) => (
 					<div
 						key={i}
 						ref={(el) => (slideRefs.current[i] = el)}
 						onClick={() => handleClick(i)}
-						className={`group relative slide ${i === activeIndex ? ' is-big' : ''}${
-							i < activeIndex ? ' is-left' : ''
-						}${i > activeIndex ? ' is-right' : ''}`}
-					>
-						<div
-							ref={(el) => (contentRefs.current[i] = el)}
-							className='slide__content relative origin-top cursor-pointer'
-						>
-							<div
-								ref={(el) => (textRefs.current[i] = el)}
-								className='slide__text absolute left-0 bottom-full w-full pb-4'
-							>
+						className={`group relative slide ${i === activeIndex ? ' is-big' : ''}${i < activeIndex ? ' is-left' : ''}${
+							i > activeIndex ? ' is-right' : ''
+						}`}>
+						<div ref={(el) => (contentRefs.current[i] = el)} className='slide__content relative origin-top cursor-pointer'>
+							<div ref={(el) => (textRefs.current[i] = el)} className='slide__text absolute left-0 bottom-full w-full pb-4'>
 								<div className='flex flex-col js-i-slide-text'>
 									<div className='slide__index mb-4'>{(i + 1 > 9 ? '' : '0') + (i + 1) + '.'}</div>
 									<h2 className='leading-none text-responsive-sm mb-2'>{item.title}</h2>
@@ -322,8 +312,7 @@ export default function InfiniteHorizontalCarousel() {
 								ref={(el) => (scaleRefs.current[i] = el)}
 								className={`slide__scale absolute origin-top inset-0 js-i-slide js-slide-content${
 									i !== 3 ? ' overflow-hidden' : ''
-								}${i === 3 ? ' is-i-big js-i-scale' : ''}`}
-							>
+								}${i === 3 ? ' is-i-big js-i-scale' : ''}`}>
 								<div className='absolute inset-0 origin-top overflow-hidden js-i-slide-mask'>
 									<div className='absolute inset-0 overflow-hidden js-i-slide-mask-inside'>
 										<div className='absolute inset-0 media-fill'>
@@ -333,6 +322,8 @@ export default function InfiniteHorizontalCarousel() {
 												alt=''
 												fill
 												priority
+												sizes='(max-width: 650px) 90vw, 50vw'
+												quality={80}
 												style={{
 													objectFit: 'cover',
 													objectPosition: 'center',

@@ -16,6 +16,8 @@ export default function page() {
 							alt=''
 							fill
 							priority
+							sizes='(max-width: 650px) 90vw, 50vw'
+							quality={80}
 							style={{ objectFit: 'cover', objectPosition: 'center' }}
 						/>
 					))}

@@ -159,28 +159,68 @@ export default function MobileCarousel() {
 		});
 
 		transform();
+		setTimeout(() => centerActiveSlide(), 50);
 	};
+
+	const centerActiveSlide = useCallback(() => {
+		if (!cache.current?.length) return;
+
+		const idx = activeIndex;
+		const slide = cache.current[idx];
+		if (!slide) return;
+
+		const bounds = getBounds(slide.el);
+		const center = window.innerWidth / 2;
+		const slideCenter = bounds.left + bounds.width / 2;
+		const delta = slideCenter - center;
+
+		gsap.to(t, {
+			current: t.current + delta,
+			duration: 0.6,
+			ease: 'power3.out',
+			onUpdate: () => {
+				tc.current = gsap.utils.interpolate(tc.current, t.current, 0.12);
+				transform();
+			},
+		});
+	}, [activeIndex]);
 
 	useEffect(() => {
 		requestAnimationFrame(() => {
 			bindEvents();
 			resize();
 
-			gsap.to('.js-i-slide-mask-inside', {
-				clipPath: 'inset(0% 0% 0% 0%)',
-				scale: 1,
-				duration: 3,
-				ease: 'snappy',
-				stagger: 0.075,
-			});
+			const tl = gsap.timeline();
 
-			gsap.to('.js-i-slide-text', {
-				yPercent: 0,
-				opacity: 1,
-				duration: 3,
-				ease: 'snappy',
-				stagger: 0.075,
-			});
+			tl.to(
+				'.js-i-slide-mask-inside',
+				{
+					clipPath: 'inset(0% 0% 0% 0%)',
+					scale: 1,
+					duration: 3,
+					ease: 'snappy',
+					stagger: {
+						each: 0.075,
+						from: activeIndex,
+						grid: 'auto',
+					},
+				},
+				0.5
+			).to(
+				'.js-i-slide-text',
+				{
+					yPercent: 0,
+					opacity: 1,
+					duration: 3,
+					ease: 'snappy',
+					stagger: {
+						each: 0.075,
+						from: activeIndex,
+						grid: 'auto',
+					},
+				},
+				'<'
+			);
 		});
 
 		return () => {
@@ -200,8 +240,9 @@ export default function MobileCarousel() {
 					<article
 						key={i}
 						ref={(el) => (slidesRef.current[i] = el)}
-						className='group relative slide js-i-slide-parent'
-					>
+						className={`group relative slide js-i-slide-parent ${i === activeIndex ? ' is-big' : ''}${
+							i < activeIndex ? ' is-left' : ''
+						}${i > activeIndex ? ' is-right' : ''}`}>
 						<div className='slide__content relative origin-top'>
 							<div className='slide__text absolute left-0 bottom-full w-full pb-4'>
 								<div className='flex flex-col js-i-slide-text'>
@@ -210,24 +251,23 @@ export default function MobileCarousel() {
 								</div>
 							</div>
 
-							<div
-								className={`absolute origin-top inset-0 js-i-slide js-slide-content ${
-									i !== 0 && 'overflow-hidden'
-								}`}
-							>
+							<div className={`absolute origin-top inset-0 js-i-slide js-slide-content ${i !== 0 && 'overflow-hidden'}`}>
 								<div
 									className={`absolute inset-0 origin-top overflow-hidden js-t-flip js-i-slide-mask ${
 										i === 0 && 'js-i-flip'
-									}`}
-								>
+									}`}>
 									<div className='absolute inset-0 overflow-hidden js-i-slide-mask-inside'>
 										<div className='absolute inset-0 media-fill'>
 											<Image
 												className='js-t-stack-item'
 												src={s.image}
+												sizes='(max-width: 650px) 90vw, 50vw'
+												quality={80}
+												priority
 												alt=''
 												fill
 												style={{ objectFit: 'cover', objectPosition: 'center' }}
+												draggable={false}
 											/>
 										</div>
 									</div>

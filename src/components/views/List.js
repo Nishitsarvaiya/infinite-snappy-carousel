@@ -61,7 +61,7 @@ export default function List() {
 
 	return (
 		<div className='absolute inset-0 pointer-events-none z-2'>
-			<div className='js-grid grid grid-cols-12 gap-10 lg:gap-6 pt-20 lg:pt-[calc((160/1920)*100vw)] px-[calc((64/1920)*100vw)]'>
+			<div className='js-grid grid grid-cols-12 gap-x-0 gap-y-10 lg:grid-cols-12 lg:gap-6 pt-20 lg:pt-[calc((160/1920)*100vw)] px-[calc((64/1920)*100vw)]'>
 				<div className='col-span-5 lg:col-span-2'>
 					<div className='relative'>
 						<div className='pt-[125%]'>
@@ -74,15 +74,13 @@ export default function List() {
 						{PROJECTS.map((item, i) => (
 							<div
 								key={item.id}
-								className={`text-2xl lg:text-[calc((64/1920)*100vw)] font-semibold leading-tight overflow-hidden cursor-pointer pointer-events-auto group`}
-								onClick={() => handleClick(i)}
-							>
+								className={`text-xl lg:text-[calc((64/1920)*100vw)] font-semibold leading-tight overflow-hidden cursor-pointer pointer-events-auto group`}
+								onClick={() => handleClick(i)}>
 								<div className='translate-y-full js-item-text'>
 									<div
 										className={`${
 											activeIndex !== null && i === activeIndex ? 'opacity-100' : 'opacity-25'
-										} group-hover:opacity-100 duration-200`}
-									>
+										} group-hover:opacity-100 duration-200`}>
 										{item.title}
 										{i !== PROJECTS.length - 1 && ','}
 									</div>
